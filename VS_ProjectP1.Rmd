@@ -1,0 +1,197 @@
+---
+title: "project_p1"
+author: "Virendra Soni"
+date: '2022-06-19'
+output:
+  word_document: default
+  pdf_document: default
+  powerpoint_presentation: default
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## R Markdown
+
+
+
+This is an R Markdown presentation. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document.
+
+```{r Load Libraries}
+library(tidyverse)
+library(tidymodels)
+library(GGally)
+library(lmtest)
+library(lubridate)
+library(leaps) 
+library(mice) 
+library(VIM) 
+library(naniar)
+library(skimr)
+library(ggcorrplot) 
+library(gridExtra) 
+library(splines)
+library(car) 
+library(glmnet)
+library(readr)
+```
+
+## Slide with Bullets
+
+- Neighborhood
+- Overall_Qual
+- Year_Built
+- Year_Remod_Add
+- Foundation
+- Bsmt_Qual
+- Heating_QC
+- Gr_Liv_Area
+- Full_Bath
+- Kitchen_Qual
+- TotRms_AbvGrd
+- Fireplaces
+- Garage_Cars
+- Wood_Deck_SF
+- Above_Median
+
+## Slide with R Output
+
+```{r Load dataset}
+
+
+ames_student <- read_csv("ames_student.csv")
+str(ames_student)
+#View(ames_student)
+summary(ames_student)
+skim(ames_student)
+
+```
+
+## Slide with Plot
+
+```{r Split dataset into multiple}
+
+ames_student = mutate_if(ames_student,is.character,as.factor)
+
+ames_house_1 = ames_student%>%select(MS_SubClass,MS_Zoning,Lot_Frontage,Lot_Area,Street,Above_Median)
+ames_house_2 = ames_student%>%select(Alley,Lot_Shape,Land_Contour,Utilities,Lot_Config,Above_Median)
+ames_house_3 = ames_student%>%select(Land_Slope,Neighborhood,Condition_1,Condition_2,Above_Median)
+ames_house_4 = ames_student%>%select(Bldg_Type,House_Style,Overall_Qual,Overall_Cond,Above_Median)
+ames_house_5 = ames_student%>%select(Year_Built,Year_Remod_Add,Roof_Style,Roof_Matl,Above_Median)
+ames_house_6 = ames_student%>%select(Exterior_1st,Exterior_2nd,Mas_Vnr_Type,Mas_Vnr_Area,Exter_Qual,Exter_Cond,Above_Median)
+ames_house_7 = ames_student%>%select(Foundation,Bsmt_Qual,Bsmt_Cond,Bsmt_Exposure,Above_Median)
+ames_house_8 = ames_student%>%select(BsmtFin_Type_1,BsmtFin_SF_1,BsmtFin_Type_2,BsmtFin_SF_2,Bsmt_Unf_SF,Total_Bsmt_SF,Above_Median)
+ames_house_9 = ames_student%>%select(Heating,Heating_QC,Central_Air,Electrical,Above_Median)
+ames_house_10 = ames_student%>%select(First_Flr_SF,Second_Flr_SF,Low_Qual_Fin_SF,Gr_Liv_Area,Above_Median)
+ames_house_11 = ames_student%>%select(Bsmt_Full_Bath,Bsmt_Half_Bath,Full_Bath,Half_Bath,Above_Median)
+ames_house_12 = ames_student%>%select(Bedroom_AbvGr,Kitchen_AbvGr,Kitchen_Qual,TotRms_AbvGrd,Above_Median)
+ames_house_13= ames_student%>%select(Functional,Fireplaces,Fireplace_Qu,Above_Median)
+ames_house_14 = ames_student%>%select(Garage_Type,Garage_Finish,Garage_Cars,Garage_Area,Garage_Qual,Garage_Cond,Above_Median)
+ames_house_15 = ames_student%>%select(Paved_Drive,Wood_Deck_SF,Open_Porch_SF,Enclosed_Porch,Three_season_porch,Screen_Porch,Above_Median)
+ames_house_16 = ames_student%>%select(Pool_Area,Pool_QC,Fence,Misc_Feature,Misc_Val,Above_Median)
+ames_house_17 = ames_student%>%select(Mo_Sold,Year_Sold,Sale_Type,Sale_Condition,Above_Median)
+ames_house_18 = ames_student%>%select(Longitude,Latitude,Above_Median)
+```
+
+```{r Check subclass relation with Above_Median}
+ames_house_0 = ames_student%>%select(MS_SubClass,Above_Median)
+summary(ames_house_0)
+ggpairs(ames_house_0,cardinality_threshold=NULL)
+```
+
+```{r Run ggpairs to identify potential variables}
+ggpairs(ames_house_1,cardinality_threshold=NULL)
+ggpairs(ames_house_2,cardinality_threshold=NULL)
+ggpairs(ames_house_3,cardinality_threshold=NULL)
+ggpairs(ames_house_4,cardinality_threshold=NULL)
+ggpairs(ames_house_5,cardinality_threshold=NULL)
+ggpairs(ames_house_6,cardinality_threshold=NULL)
+ggpairs(ames_house_7,cardinality_threshold=NULL)
+ggpairs(ames_house_8,cardinality_threshold=NULL)
+ggpairs(ames_house_9,cardinality_threshold=NULL)
+ggpairs(ames_house_10,cardinality_threshold=NULL)
+ggpairs(ames_house_11,cardinality_threshold=NULL)
+ggpairs(ames_house_12,cardinality_threshold=NULL)
+ggpairs(ames_house_13,cardinality_threshold=NULL)
+ggpairs(ames_house_14,cardinality_threshold=NULL)
+ggpairs(ames_house_15,cardinality_threshold=NULL)
+ggpairs(ames_house_16,cardinality_threshold=NULL)
+ggpairs(ames_house_17,cardinality_threshold=NULL)
+ggpairs(ames_house_18,cardinality_threshold=NULL)
+
+```
+
+```{r}
+
+ames_house = ames_student%>%select(Neighborhood,Overall_Qual,Year_Built,Year_Remod_Add,Foundation,Bsmt_Qual,Heating_QC,Gr_Liv_Area,Full_Bath,Kitchen_Qual,TotRms_AbvGrd,Fireplaces,Garage_Cars,Wood_Deck_SF,Above_Median)
+summary(ames_house)
+str(ames_house)
+skim(ames_house)
+
+```
+```{r Visualization External}
+
+pNb = ggplot(ames_house,aes(x=Neighborhood, fill=Above_Median)) +   geom_bar() + theme(axis.text.x = element_text(angle = 45, size = 6, vjust = 1, hjust=1))
+
+grid.arrange(pNb)
+```
+```{r Visualization External 2}
+pYB = ggplot(ames_house,aes(x=Year_Built, fill=Above_Median)) +   geom_bar() + theme(axis.text.x = element_text(angle = 45, size = 6, vjust = 1, hjust=1)) 
+pYRA = ggplot(ames_house,aes(x=Year_Remod_Add, fill=Above_Median)) +   geom_bar() + theme(axis.text.x = element_text(angle = 45, size = 6, vjust = 1, hjust=1)) 
+
+
+pYB = pYB + labs(x ="Year Built")
+pYRA = pYRA + labs(x ="Year Remodeled")
+
+grid.arrange(pYB,pYRA)
+
+```
+```{r Visualization Quality}
+pOQ = ggplot(ames_house,aes(x=Overall_Qual, fill=Above_Median)) +   geom_bar() + theme(axis.text.x = element_text(angle = 45, size = 6, vjust = 1, hjust=1))
+pBQ = ggplot(ames_house,aes(x=Bsmt_Qual, fill=Above_Median)) +   geom_bar() + theme(axis.text.x = element_text(angle = 45, size = 6, vjust = 1, hjust=1))
+pKQ = ggplot(ames_house,aes(x=Kitchen_Qual, fill=Above_Median)) +   geom_bar() + theme(axis.text.x = element_text(angle = 45, size = 6, vjust = 1, hjust=1))
+pHQ = ggplot(ames_house,aes(x=Heating_QC, fill=Above_Median)) +   geom_bar() + theme(axis.text.x = element_text(angle = 45, size = 6, vjust = 1, hjust=1))
+
+pOQ = pOQ + labs(x ="Overall Quality")
+pBQ = pBQ + labs(x ="Basement Quality")
+pKQ = pKQ + labs(x ="Kitchen Quality")
+pHQ = pHQ + labs(x ="Heating System Quality")
+
+grid.arrange(pOQ,pBQ,pKQ,pHQ)
+```
+```{r Visualization Structural}
+pFN = ggplot(ames_house,aes(x=Foundation, fill=Above_Median)) +   geom_bar() + theme(axis.text.x = element_text(angle = 45, size = 6, vjust = 1, hjust=1))
+pWDSF =   ggplot(ames_house,aes(x=Wood_Deck_SF, fill=Above_Median)) +   geom_boxplot() 
+
+pFP = ggplot(ames_house,aes(x=Fireplaces, fill=Above_Median)) +   geom_bar() 
+pGC = ggplot(ames_house,aes(x=Garage_Cars, fill=Above_Median)) +   geom_bar() 
+
+pFN = pFN + labs(x ="Foundation Type")
+pWDSF = pWDSF + labs(x ="Wooden Deck (SF)")
+pFP = pFP + labs(x ="No. Of Fireplaces")
+pGC = pGC + labs(x ="Garage Cars")
+
+grid.arrange(pFN,pWDSF,pFP,pGC)
+```
+```{r Visualization Design}
+pGLA = ggplot(ames_house,aes(x=Gr_Liv_Area, fill=Above_Median)) +   geom_boxplot() + theme(axis.text.x = element_text(angle = 45, size = 6, vjust = 1, hjust=1))
+pFB = ggplot(ames_house,aes(x=Full_Bath, fill=Above_Median)) +   geom_bar() + theme(axis.text.x = element_text(angle = 45, size = 6, vjust = 1, hjust=1))
+pTRAG = ggplot(ames_house,aes(x=TotRms_AbvGrd, fill=Above_Median)) +   geom_bar() + theme(axis.text.x = element_text(angle = 45, size = 6, vjust = 1, hjust=1))
+
+pGLA = pGLA + labs(x ="Greater Or living Area")
+pFB = pFB + labs(x ="No. Of Full Baths")
+pTRAG = pTRAG + labs(x ="Total Rooms Above Ground")
+
+grid.arrange(pGLA,pFB,pTRAG)
+```
+
+
+```{r}
+#ames_student_2 = ames_student_2%>%mutate(Above_Median = as.factor(Above_Median))%>%mutate(Above_Median = fct_recode(Above_Median, "No" = "0", "Yes" = "1")) 
+
+```
